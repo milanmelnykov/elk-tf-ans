@@ -1,0 +1,20 @@
+cluster.name: elasticsearch_cluster
+node.name: "{{ ansible_hostname }}"
+node.master: true
+node.data: true
+discovery.zen.minimum_master_nodes: 2
+network.host: ["{{ ansible_hostname }}", "localhost"]
+
+discovery.zen.ping.unicast.hosts:
+{% for host in groups['elasticsearch'] %}
+  - {{ hostvars[host].ansible_hostname }}
+{% endfor %}
+
+cluster.initial_master_nodes:
+{% for host in groups['elasticsearch'] %}
+  - {{ hostvars[host].ansible_hostname }}
+{% endfor %}
+
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+

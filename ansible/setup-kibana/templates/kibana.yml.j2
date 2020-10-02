@@ -1,0 +1,6 @@
+elasticsearch.hosts:
+{% for host in groups['elasticsearch'] %}
+  - http://{{ hostvars[host].ansible_hostname }}:9200
+{% endfor %}
+
+

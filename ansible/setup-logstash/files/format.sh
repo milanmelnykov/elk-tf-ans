@@ -1,0 +1,1 @@
+while IFS= read -r line; do echo -n "\"$line:9200\", "; done < $1 | sed 's/..$//'

@@ -1,0 +1,23 @@
+- name: elasticsearch setup
+  hosts: elasticsearch 
+  become: yes
+  tasks:
+    - include_role:
+        name: setup-elasticsearch
+        tasks_from: main
+
+- name: kibana setup
+  hosts: kibana 
+  become: yes
+  tasks:
+    - include_role:
+        name: setup-kibana
+        tasks_from: main
+
+# - name: logstash setup
+#   hosts: logstash 
+#   become: yes
+#   tasks:
+#     - include_role:
+#         name: setup-logstash
+#         tasks_from: main

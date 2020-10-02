@@ -1,0 +1,3 @@
+{% for host in groups['elasticsearch'] %}
+{{ hostvars[host].ansible_hostname }}
+{% endfor %}

@@ -1,0 +1,51 @@
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: Copy elasticsearch repo
+  copy:
+    src: ./setup-elasticsearch/files/elasticsearch.repo
+    dest: /etc/yum.repos.d/elasticsearch.repo
+    mode: '0644'
+
+- name: Install java, elasticsearch
+  yum: 
+    state: present
+    name: 
+      - java-1.8.0-openjdk
+      - elasticsearch
+
+- name: Generate /etc/hosts from template
+  template:
+    src: ./setup-elasticsearch/templates/hosts.j2
+    dest: /etc/hosts
+    mode: '0644'
+
+- name: Generate elasticsearch.yml
+  template:
+    src: ./setup-elasticsearch/templates/elasticsearch.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    mode: '0660'
+
+# - name: Get hostnames into file
+#   template:
+#     src: ./setup-elasticsearch/templates/hostnames.j2
+#     dest: ~/hostnames
+#     mode: '0644'
+
+# - name: Copy format.sh
+#   copy:
+#     src: ./setup-elasticsearch/files/format.sh
+#     dest: ~/format.sh
+
+# - name: Paste first part of config
+#   shell: "cat ~/tempfile.yml > /etc/elasticsearch/elasticsearch.yml"
+
+# - name: Echo config line to elasticsearch.yml
+#   shell: "echo discovery.zen.ping.unicast.hosts: [$(bash ~/format.sh ~/hostnames)] >> /etc/elasticsearch/elasticsearch.yml"
+
+- name: Start and enable elasticsearch
+  systemd: 
+     name: elasticsearch
+     state: started 
+     enabled: yes

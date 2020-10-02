@@ -1,0 +1,57 @@
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: Add Elasticsearch GPG key.
+  rpm_key:
+    key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  register: check 
+- name: Copy logstash repo
+  copy:
+    src: ./setup-logstash/files/logstash.repo
+    dest: /etc/yum.repos.d/logstash.repo
+    mode: '0644'
+
+- name: Install logstash, java
+  yum: 
+    state: present
+    name: 
+      - logstash
+      - java-1.8.0-openjdk
+
+- name: Generate /etc/hosts from template
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: '0644'
+  with_items:
+    - { src: ./setup-logstash/templates/hosts.j2, dest: /etc/hosts }
+    - { src: ./setup-logstash/templates/hostnames.j2, dest: /tmp/hostnames }
+
+- name: Copy logstash.conf pipeline 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: '0644'
+  with_items:
+    - { src: ./setup-logstash/files/logstash.conf, dest: /etc/logstash/conf.d/logstash.conf }
+    - { src: ./setup-logstash/files/format.sh, dest: /tmp }
+
+- name: Add elasticsearch hosts info to logstash.conf pipeline 
+  shell: sed -i "s/localhost/[$(sh format.sh hostnames)]/g" /etc/logstash/conf.d/logstash.conf 
+  args:
+    chdir: /tmp 
+
+- name: Link logstash to systemctl 
+  shell: ./system-install 
+  args:
+    chdir: /usr/share/logstash/bin
+  when: check.changed
+
+
+- name: Start and enable logstash
+  systemd: 
+     name: logstash
+     state: started 
+     enabled: yes

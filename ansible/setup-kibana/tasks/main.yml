@@ -1,0 +1,61 @@
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: Copy kibana repo
+  copy:
+    src: ./setup-kibana/files/kibana.repo
+    dest: /etc/yum.repos.d/kibana.repo
+    mode: '0644'
+
+- name: Install epel-release
+  yum: 
+    state: present
+    name: 
+      - epel-release
+
+- name: Install kibana, nginx
+  yum: 
+    state: present
+    name: 
+      - kibana
+      - nginx
+
+- name: Generate /etc/hosts from template
+  template:
+    src: ./setup-kibana/templates/hosts.j2
+    dest: /etc/hosts
+    mode: '0644'
+  
+- name: Generate kibana.conf for nginx from template
+  template:
+    src: ./setup-kibana/templates/kibana.conf.j2
+    dest: /etc/nginx/conf.d/kibana.conf
+    mode: '0644'
+
+- name: Change default configs for nginx
+  template:
+    src: ./setup-kibana/files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    mode: '0644'
+
+- name: Generate kibana.yml
+  template:
+    src: ./setup-kibana/templates/kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    mode: '0660'
+
+- name: Start and enable kibana
+  systemd: 
+     name: kibana
+     state: started 
+     enabled: yes
+
+- name: Start and enable nginx
+  systemd: 
+     name: nginx
+     state: started 
+     enabled: yes
+
+
+
