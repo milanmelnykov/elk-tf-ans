@@ -13,11 +13,15 @@
     - include_role:
         name: setup-kibana
         tasks_from: main
+      vars:
+        my_cookie_secret: "{{ cookie_secret }}"
+        my_github_id: "{{ github_id }}"
+        my_github_secret: "{{ github_secret }}"
 
-# - name: logstash setup
-#   hosts: logstash 
-#   become: yes
-#   tasks:
-#     - include_role:
-#         name: setup-logstash
-#         tasks_from: main
+- name: logstash setup
+  hosts: logstash 
+  become: yes
+  tasks:
+    - include_role:
+        name: setup-logstash
+        tasks_from: main

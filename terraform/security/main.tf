@@ -3,7 +3,7 @@ variable "vpc_id" {
 }
 
 
-# Security Group for kibana
+# Security Group for bastion
 resource "aws_security_group" "bastion_sg" {
   name   = "bastion-sg"
   vpc_id = var.vpc_id
