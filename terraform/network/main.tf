@@ -102,7 +102,7 @@ resource "aws_route_table" "private_route_table" {
 
 # route (to ngw)
 resource "aws_route" "private_route_for_nat_gateway" {
-  count                  = length(aws_route_table.private_route_table.*.id)
+  count                  = length(var.vpc_parameter.private_subnets)
   route_table_id         = element(aws_route_table.private_route_table.*.id, count.index)
   nat_gateway_id         = element(aws_nat_gateway.nat_gateway.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
